@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nosso Amor</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 0;
+      }
+
+      #videoBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+      }
+
+      #videoBackground iframe {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(30%); /* Filtro escurecido para maior contraste */
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        background: rgba(
+          255,
+          182,
+          193,
+          0.85
+        ); /* Fundo rosa claro com leve transparência */
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3); /* Sombra elegante */
+        color: #7b1f1f; /* Texto vermelho suave */
+        text-align: center;
+        max-width: 700px;
+        margin: auto;
+        backdrop-filter: blur(8px);
+        margin-top: 10%;
+      }
+
+      h1 {
+        color: white; /* Rosa suave para os títulos */
+        font-size: 2.5em;
+        font-family: "fantasy"; /* Fonte mais romântica */
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 12px 0;
+        border: none;
+        border-radius: 8px;
+        background: rgba(
+          255,
+          228,
+          225,
+          0.9
+        ); /* Input com fundo claro e suave */
+        color: #7b1f1f;
+        font-size: 1.1em;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: rgba(123, 31, 31, 0.6);
+      }
+
+      button {
+        background-color: #ff6f61; /* Botão salmão */
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        background-color: #e55b50;
+      }
+
+      .details {
+        font-size: 1.3em;
+        margin-top: 25px;
+        line-height: 1.6em;
+      }
+
+      #photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        margin-top: 20px;
+        object-fit: cover;
+        border: 3px solid white; /* Borda para destacar a imagem */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombras suaves na imagem */
+      }
+
+      @media screen and (max-width: 700px) {
+        .container {
+          padding: 25px;
+          max-width: 90%;
+        }
+
+        h1 {
+          font-size: 2em;
+        }
+
+        .details {
+          font-size: 1.2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="videoBackground"></div>
+
+    <div class="container" id="app">
+      <!-- O conteúdo será gerado dinamicamente aqui -->
+    </div>
+
+    <script>
+      // Função para codificar Unicode corretamente para Base64
+      function utf8ToBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+
+      // Função para decodificar Base64 corretamente para Unicode
+      function base64ToUtf8(str) {
+        return decodeURIComponent(escape(atob(str)));
+      }
+
+      // Função para criptografar os dados
+      function encryptData(data) {
+        return utf8ToBase64(JSON.stringify(data));
+      }
+
+      // Função para descriptografar os dados
+      function decryptData(encoded) {
+        return JSON.parse(base64ToUtf8(encoded));
+      }
+
+      // Função para calcular a diferença de tempo
+      function calculateTimeDifference(startDate) {
+        const now = new Date();
+        const diffTime = Math.abs(now - new Date(startDate));
+        const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365));
+        const diffMonths = Math.floor(
+          (diffTime % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30)
+        );
+        const diffDays = Math.floor(
+          (diffTime % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24)
+        );
+        return `${diffYears} anos, ${diffMonths} meses e ${diffDays} dias`;
+      }
+
+      // Função para gerar o formulário
+      function renderForm() {
+        document.getElementById("app").innerHTML = `
+            <h1>Nosso Amor</h1>
+            <form id="loveForm">
+                <input type="text" id="nome" placeholder="Nome do Casal" required>
+                <input type="date" id="data" required>
+                <input type="url" id="youtube" placeholder="Link do YouTube" required>
+                <textarea id="descricao" placeholder="Descrição do Amor" required></textarea>
+                <input type="file" id="foto" accept="image/*">
+                <button type="submit">Enviar</button>
+            </form>
+        `;
+        document
+          .getElementById("loveForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const nome = document.getElementById("nome").value;
+            const data = document.getElementById("data").value;
+            const youtube = document.getElementById("youtube").value;
+            const descricao = document.getElementById("descricao").value;
+            const fotoInput = document.getElementById("foto").files[0];
+
+            if (fotoInput) {
+              const reader = new FileReader();
+              reader.onloadend = function () {
+                const img = new Image();
+                img.src = reader.result;
+
+                // Redimensiona a imagem mantendo proporção e corta no centro
+                img.onload = function () {
+                  const canvas = document.createElement("canvas");
+                  const ctx = canvas.getContext("2d");
+                  const minDimension = Math.min(img.width, img.height);
+                  canvas.width = 120;
+                  canvas.height = 120;
+                  // Cortar a imagem a partir do centro
+                  ctx.drawImage(
+                    img,
+                    (img.width - minDimension) / 2,
+                    (img.height - minDimension) / 2,
+                    minDimension,
+                    minDimension,
+                    0,
+                    0,
+                    120,
+                    120
+                  );
+                  const fotoBase64 = canvas.toDataURL("image/jpeg");
+
+                  const payload = {
+                    nome,
+                    data,
+                    youtube,
+                    descricao,
+                    foto: fotoBase64,
+                  };
+                  const token = encryptData(payload);
+                  window.location.href = `?MYLOVE=${token}`;
+                };
+              };
+              reader.readAsDataURL(fotoInput);
+            } else {
+              const payload = {
+                nome,
+                data,
+                youtube,
+                descricao,
+                foto: null,
+              };
+              const token = encryptData(payload);
+              window.location.href = `?MYLOVE=${token}`;
+            }
+          });
+      }
+
+      // Função para exibir os dados descriptografados
+      function renderLoveDetails(data) {
+        const timeTogether = calculateTimeDifference(data.data);
+        const fotoHtml = data.foto
+          ? `<img src="${data.foto}" alt="Foto do casal" id="photo">`
+          : "";
+        document.getElementById("app").innerHTML = `
+            <h1>${data.nome}</h1>
+            ${fotoHtml}
+            <p class="details">${data.descricao} <br/><b>${timeTogether}</b></p>
+        `;
+        setYouTubeBackground(data.youtube);
+      }
+
+      // Função para definir o vídeo de fundo com áudio ativo
+      function setYouTubeBackground(url) {
+        const videoId = url.split("v=")[1].split("&")[0];
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&mute=0&playlist=${videoId}&mute=0`; // Agora o áudio é ativado
+        iframe.frameborder = "0";
+        iframe.allow = "autoplay; encrypted-media";
+        iframe.id = "videoPlayer";
+        document.getElementById("videoBackground").appendChild(iframe);
+      }
+
+      // Verifica se o parâmetro MYLOVE existe na URL
+      const params = new URLSearchParams(window.location.search);
+      const myLoveParam = params.get("MYLOVE");
+
+      if (myLoveParam) {
+        const decryptedData = decryptData(myLoveParam);
+        renderLoveDetails(decryptedData);
+      } else {
+        renderForm();
+      }
+    </script>
+  </body>
+</html>
